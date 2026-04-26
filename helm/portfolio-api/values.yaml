@@ -1,0 +1,19 @@
+replicaCount: 1
+
+image:
+  repository: me-west1-docker.pkg.dev/n8n-test-workflows-489814/portfolio-api/portfolio-api
+  pullPolicy: IfNotPresent
+  tag: v1
+
+service: 
+  type: LoadBalancer
+  port: 80
+  targetPort: 8000
+
+resources: 
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 200m
+    memory: 256Mi
