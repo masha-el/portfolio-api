@@ -41,9 +41,42 @@
             "Resolved complex technical issues for global customers using advanced troubleshooting, terminal tools, and network analysis",
             "Diagnosed system and network-level issues using packet analysis and low-level debugging techniques"      
         ]
+        },
+        {
+        "company": "Cyber 2.0",
+        "role": "Junior System Administrator",
+        "period": "2018-2019",
+        "highlights": [
+            "Administer windows servers, laptop and desktop computers, printers, switches and routers.",
+            "Creation and configuration of virtualization infrastructure using HyperV and VmWare."      
+        ]
+        },
+        {
+        "company": "Horangi",
+        "role": "IT Support Technician",
+        "period": "2017-2018",
+        "highlights": [
+            "IT support"
+        ]
+        },
+        {
+        "company": "Open Access BPO (Philippines)",
+        "role": "Support Team Lead",
+        "period": "2015-2017",
+        "highlights": [
+            "Managed a team of customer service agents, with coordination of the Philippines and US offices."     
+        ]
+        },
+        {
+        "company": "RAD Data Communications",
+        "role": "IT Technician",
+        "period": "2014-2015",
+        "highlights": [
+            "Operations ongoing maintenance of the company’s servers, desktops and network equipment. "     
+        ]
         }
-    ],
-    "projects": [
+  ],
+  "projects": [
         {
         "name": "FamilyBot — Telegram Family Assistant Bot",
         "highlights": [
@@ -61,8 +94,6 @@
             "Deployed on GCP e2-micro with Docker Compose; automated CI/CD pipeline via GitHub Actions"      
         ]
         }
-    ],
-    
-  
+  ],
   "languages": ["Hebrew", "English", "Russian"]
 }
