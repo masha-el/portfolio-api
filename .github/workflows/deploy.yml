@@ -1,0 +1,51 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  PROJECT_ID: n8n-test-workflows-489814
+  REGION: me-west1
+  REGISTRY: me-west1-docker.pkg.dev
+  IMAGE: me-west1-docker.pkg.dev/n8n-test-workflows-489814/portfolio-api/portfolio-api
+  CLUSTER: portfolio-cluster
+  CLUSTER_ZONE: me-west1-a
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Configure Docker for Artifact Registry
+        run: gcloud auth configure-docker ${{ env.REGISTRY }} --quiet
+
+      - name: Build and push Docker image
+        run: |
+          docker buildx build --platform linux/amd64 \
+            -t ${{ env.IMAGE }}:${{ github.sha }} \
+            --push .
+
+      - name: Get GKE credentials
+        uses: google-github-actions/get-gke-credentials@v2
+        with:
+          cluster_name: ${{ env.CLUSTER }}
+          location: ${{ env.CLUSTER_ZONE }}
+
+      - name: Deploy with Helm
+        run: |
+          helm upgrade portfolio-api helm/portfolio-api \
+            --set image.tag=${{ github.sha }} \
+            --set image.repository=${{ env.IMAGE }}
