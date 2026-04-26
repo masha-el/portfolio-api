@@ -3,7 +3,7 @@ replicaCount: 1
 image:
   repository: me-west1-docker.pkg.dev/n8n-test-workflows-489814/portfolio-api/portfolio-api
   pullPolicy: IfNotPresent
-  tag: v1
+  tag: v2
 
 service: 
   type: LoadBalancer
