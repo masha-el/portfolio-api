@@ -498,6 +498,22 @@
       }
     }
 
+    function renderJob(job) {
+      return `
+        <div class="card">
+          <div class="job-meta">
+            <div>
+              <div class="job-role">${job.role}</div>
+              <div class="job-company">${job.company}</div>
+            </div>
+            <span class="job-period">${job.period}</span>
+          </div>
+          <ul class="highlights">
+            ${job.highlights.map(h => `<li>${highlightNumbers(h)}</li>`).join("")}
+          </ul>
+        </div>`;
+    }
+
     function render(cv) {
       const pinned  = cv.experience.slice(0, 3);
       const earlier = cv.experience.slice(3);
