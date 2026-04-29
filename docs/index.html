@@ -522,7 +522,7 @@
       const projects = (cv.projects || []).map(p =>{
         const linkKey = Object.keys(PROJECT_LINKS).find(k => p.name.includes(k));
         const githubLink = linkKey
-            ? `<a class="project-link" href="${PROJECT_LINKS[linkKey]}" target="_blank">⎋ GitHub</a>`
+            ? `<a class="project-link" href="${PROJECT_LINKS[linkKey]}" target="_blank">GitHub</a>`
             : "";
             return `
               <div class="card">
