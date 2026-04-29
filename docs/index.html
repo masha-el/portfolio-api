@@ -14,8 +14,8 @@
       --border: #1c2333;
       --accent: #4fc3f7;
       --accent2: #00e5cc;
-      --text: #c9d1d9;
-      --text-dim: #586069;
+      --text: #dce3e8;
+      --text-dim: #8b949e;
       --text-bright: #f0f6fc;
       --red: #ff6b6b;
       --highlight: #f0b429;
@@ -90,7 +90,7 @@
       font-weight: 500;
     }
 
-    .name-block .posittioning {
+    .name-block .positioning {
         font-size: 0.85rem;
         color: var(--text-dim);
         margin-top: 10px;
@@ -193,10 +193,10 @@
     section:nth-of-type(4) { animation-delay: 0.4s; }
 
     .section-label {
-      font-size: 0.65rem;
+      font-size: 0.75rem;
       letter-spacing: 4px;
       text-transform: uppercase;
-      color: var(--text-dim);
+      color: var(--accent);
       margin-bottom: 20px;
       display: flex;
       align-items: center;
@@ -219,10 +219,10 @@
         letter-spacing: 2px;
         text-transform: uppercase;
         color: var(--text-dim);
-        min-width: 110px;
-        padding-right: 8px;
+        width: 110px;
+        flex-shrink: 0;
+        padding-right: 12px;
         border-right: 1px solid var(--border);
-        margin-right: 4px;
     }
 
     .skill-tag {
@@ -339,6 +339,7 @@
       display: flex;
       gap: 12px;
       flex-wrap: wrap;
+      margin-top: 30px;
     }
 
     .lang-tag {
@@ -351,7 +352,7 @@
     }
 
     .footer {
-      margin-top: 60px;
+      margin-top: 5px;
       padding-top: 20px;
       border-top: 1px solid var(--border);
       display: flex;
@@ -556,9 +557,9 @@
             <span>${cv.contact.location}</span>
           </div>
           <div class="cta-row">
-            <a class="cta-btn primary" href="mailto:${cv.contact.email}">✉ Contact me</a>
-            <a class="cta-btn secondary" href="https://www.linkedin.com/in/mashaelgart" target="_blank">in LinkedIn</a>
-            <a class="cta-btn secondary" href="https://github.com/masha-el" target="_blank">⎋ GitHub</a>
+            <a class="cta-btn primary" href="mailto:${cv.contact.email}">Contact me</a>
+            <a class="cta-btn secondary" href="https://www.linkedin.com/in/mashaelgart" target="_blank">LinkedIn</a>
+            <a class="cta-btn secondary" href="https://github.com/masha-el" target="_blank">GitHub</a>
           </div>
         </header>
 
