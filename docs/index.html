@@ -18,6 +18,7 @@
       --text-dim: #586069;
       --text-bright: #f0f6fc;
       --red: #ff6b6b;
+      --highlight: #f0b429;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -41,6 +42,11 @@
       background-size: 40px 40px;
       pointer-events: none;
       z-index: 0;
+    }
+
+    .highlight-number {
+      color: var(--highlight);
+      font-weight: 500;
     }
 
     .wrapper {
@@ -82,6 +88,14 @@
       text-transform: uppercase;
       margin-top: 8px;
       font-weight: 500;
+    }
+
+    .name-block .posittioning {
+        font-size: 0.85rem;
+        color: var(--text-dim);
+        margin-top: 10px;
+        line-height: 1.5;
+        max-width: 480px;
     }
 
     .status-badge {
@@ -129,6 +143,45 @@
       font-size: 0.6rem;
     }
 
+    .cta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .cta-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 8px 16px;
+      border-radius: 4px;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      text-decoration: none;
+      transition: background 0.2s, border-color 0.2s, color 0.2s;;
+      cursor: pointer;
+    }
+
+    .cta-btn.primary {
+        background: var(--accent);
+        color: #080b10;
+        border: 1px solid var(--accent);
+        font-weight: 500;
+    }
+
+    .cta-btn.primary:hover { background: #81d4fa; border-color: #81d4fa; }
+
+    .cta-btn.secondary {
+        background: transparent;
+        color: var(--text);
+        border: 1px solid var(--border);
+    }
+
+    .cta-btn.secondary:hover { border-color: var(--accent); color: var(--accent); }
+
     section {
       margin-bottom: 52px;
       animation: fadeUp 0.6s ease both;
@@ -157,10 +210,19 @@
       background: var(--border);
     }
 
-    .skills-grid {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
+    .skills-categories { display: flex; flex-direction: column; gap: 14px; }
+
+    .skill-category { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+    
+    .skill-category-label {
+        font-size: 0.65rem;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: var(--text-dim);
+        min-width: 110px;
+        padding-right: 8px;
+        border-right: 1px solid var(--border);
+        margin-right: 4px;
     }
 
     .skill-tag {
@@ -344,6 +406,44 @@
       letter-spacing: 1px;
     }
 
+    .earlier-toggle {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 8px;
+        cursor: pointer;
+        font-size: 0.72rem;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: var(--text-dim);
+        background: none;
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        padding: 10px 16px;
+        width: 100%;
+        text-align: left;
+        transition: border-color 0.2s, color 0.2s;
+        font-family: 'DM Mono', monospace;
+    }
+
+    .earlier-toggle:hover { border-color: var(--accent); color: var(--accent); }
+    .toggle-arrow { transition: transform 0.2s; font-size: 0.6rem; }
+    .toggle-arrow.open { transform: rotate(90deg); }
+    .earlier-cards { display: none; margin-top: 12px; }
+    .earlier-cards.open { display: block; }
+
+    .project-links { display: flex; gap: 12px; margin-bottom: 12px; }
+
+    .project-link {
+        font-size: 0.7rem;
+        color: var(--accent);
+        text-decoration: none;
+        opacity: 0.8;
+        transition: opacity 0.2s;
+    }
+
+    .project-link:hover { opacity: 1; }
+
     @keyframes fadeUp {
       from { opacity: 0; transform: translateY(16px); }
       to   { opacity: 1; transform: translateY(0); }
@@ -372,6 +472,20 @@
   <script>
     const API = "https://api.elgart.tech/cv";
 
+    const SKILL_CATEGORIES = [
+     { label: "Orchestration", skills: ["Kubernetes", "Helm", "ArgoCD", "GitOps", "Docker"] },
+     { label: "Cloud",         skills: ["AWS", "GCP"] },
+     { label: "IaC & CI/CD",   skills: ["Terraform", "Terragrunt", "CI/CD", "Jenkins"] },
+     { label: "Observability", skills: ["Grafana"] },
+     { label: "Scripting",     skills: ["Python", "Bash"] },
+     { label: "Security",      skills: ["Twingate", "ESET"] },
+    ];
+
+    const PROJECT_LINKS = {
+        "FamilyBot": "https://github.com/masha-el/family-bot",
+        "Corti":     "https://github.com/masha-el/corti-bot",
+    };
+
     async function load() {
       try {
         const res = await fetch(API);
@@ -385,33 +499,23 @@
     }
 
     function render(cv) {
-      const skills = cv.skills.map(s =>
-        `<span class="skill-tag">${s}</span>`
-      ).join("");
+      const pinned  = cv.experience.slice(0, 3);
+      const earlier = cv.experience.slice(3);
 
-      const experience = cv.experience.map(job => `
-        <div class="card">
-          <div class="job-meta">
-            <div>
-              <div class="job-role">${job.role}</div>
-              <div class="job-company">${job.company}</div>
-            </div>
-            <span class="job-period">${job.period}</span>
-          </div>
-          <ul class="highlights">
-            ${job.highlights.map(h => `<li>${h}</li>`).join("")}
-          </ul>
-        </div>
-      `).join("");
-
-      const projects = (cv.projects || []).map(p => `
-        <div class="card">
-          <div class="project-name">${p.name}</div>
-          <ul class="highlights">
-            ${p.highlights.map(h => `<li>${h}</li>`).join("")}
-          </ul>
-        </div>
-      `).join("");
+      const projects = (cv.projects || []).map(p =>{
+        const linkKey = Object.keys(PROJECT_LINKS).find(k => p.name.includes(k));
+        const githubLink = linkKey
+            ? `<a class="project-link" href="${PROJECT_LINKS[linkKey]}" target="_blank">⎋ GitHub</a>`
+            : "";
+            return `
+              <div class="card">
+                <div class="project-name">${p.name}</div>
+                <div class="project-links">${githubLink}</div>
+                <ul class="highlights">
+                  ${p.highlights.map(h => `<li>${h}</li>`).join("")}
+                </ul>
+              </div>`;
+    }).join("");
 
       const languages = cv.languages.map(l =>
         `<span class="lang-tag">${l}</span>`
@@ -423,6 +527,7 @@
             <div class="name-block">
               <h1>${cv.name}</h1>
               <div class="title">${cv.title}</div>
+              <div class="positioning">I build and operate the infrastructure that lets engineering teams ship faster.</div>
             </div>
             <div class="status-badge">
               <span class="status-dot"></span>
@@ -434,16 +539,29 @@
             <span>${cv.contact.phone}</span>
             <span>${cv.contact.location}</span>
           </div>
+          <div class="cta-row">
+            <a class="cta-btn primary" href="mailto:${cv.contact.email}">✉ Contact me</a>
+            <a class="cta-btn secondary" href="https://www.linkedin.com/in/mashaelgart" target="_blank">in LinkedIn</a>
+            <a class="cta-btn secondary" href="https://github.com/masha-el" target="_blank">⎋ GitHub</a>
+          </div>
         </header>
 
         <section>
           <div class="section-label">Skills</div>
-          <div class="skills-grid">${skills}</div>
+          <div class="skills-categories">${renderSkills(cv.skills)}</div>
         </section>
 
         <section>
           <div class="section-label">Experience</div>
-          ${experience}
+          ${pinned.map(renderJob).join("")}
+          ${earlier.length ? `
+            <button class="earlier-toggle" onclick="toggleEarlier(this)">
+              <span class="toggle-arrow">▶</span>
+              Earlier experience (${earlier.length} roles)
+            </button>
+            <div class="earlier-cards">
+              ${earlier.map(renderJob).join("")}
+            </div>` : ""}
         </section>
 
         ${projects ? `
@@ -465,6 +583,29 @@
           <div class="api-badge">${API}</div>
         </div>
       `;
+    }
+
+    function renderSkills(allSkills) {
+        return SKILL_CATEGORIES.map(cat => {
+            const matched = cat.skills.filter(s => allSkills.includes(s));
+            if (!matched.length) return "";
+            return `
+                <div class="skill-category">
+                    <span class="skill-category-label">${cat.label}</span>
+                    ${matched.map(s => `<span class="skill-tag">${s}</span>`).join("")}
+                </div>`;
+        }).join("");
+    }
+
+    function highlightNumbers(text) {
+        return text.replace(/65%|60 → 20 minutes/g, m =>
+            `<span class="highlight-number">${m}</span>`
+        );
+    }
+
+    function toggleEarlier(btn) {
+        btn.querySelector('.toggle-arrow').classList.toggle('open');
+        btn.nextElementSibling.classList.toggle('open');
     }
 
     load();
