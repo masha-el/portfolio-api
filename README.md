@@ -74,6 +74,12 @@ portfolio-api/
 ├── main.py                  # FastAPI app
 ├── requirements.txt
 ├── Dockerfile
+├── infra/
+│   └── demo/                # Terraform for temporary GCP demo infrastructure
+├── scripts/
+│   ├── demo-up.sh           # Create demo infrastructure
+│   ├── demo-status.sh       # Check deployed demo service
+│   └── demo-down.sh         # Destroy demo infrastructure
 ├── helm/
 │   └── portfolio-api/       # Helm chart
 │       ├── Chart.yaml
@@ -118,6 +124,168 @@ When run manually, the workflow:
 5. Runs `helm upgrade` with the new image tag
 
 This keeps the DevOps demo deployable while preventing every push to `main` from starting or updating paid GCP infrastructure.
+
+---
+
+## DevOps Demo Runbook
+
+Use this flow when you want to temporarily run the API on GKE for a demo or for practice.
+
+Prerequisites on your machine:
+
+1. Terraform
+2. Google Cloud CLI
+3. kubectl
+4. Access to the GCP project
+
+Authenticate before running Terraform:
+
+```bash
+gcloud auth login
+gcloud auth application-default login
+gcloud config set project n8n-test-workflows-489814
+```
+
+### 1. Create Demo Infrastructure
+
+Copy the example Terraform variables file:
+
+```bash
+cd infra/demo
+cp terraform.tfvars.example terraform.tfvars
+```
+
+Review `terraform.tfvars`, then create the temporary infrastructure:
+
+```bash
+terraform init
+terraform plan
+terraform apply
+```
+
+Or use the helper script from the repository root:
+
+```bash
+./scripts/demo-up.sh
+```
+
+Terraform creates:
+
+1. Required GCP APIs
+2. Artifact Registry Docker repository
+3. One-node GKE cluster
+4. A small demo node pool
+
+The default node pool uses Spot VMs to reduce cost. If you need more reliability during a live demo, set this in `terraform.tfvars`:
+
+```hcl
+use_spot_nodes = false
+```
+
+If the Artifact Registry repository already exists because it was created manually before, import it into Terraform state instead of creating a duplicate:
+
+```bash
+terraform import google_artifact_registry_repository.portfolio_api projects/n8n-test-workflows-489814/locations/me-west1/repositories/portfolio-api
+```
+
+### 2. Deploy the API
+
+Go to GitHub:
+
+```text
+Actions -> Build and Deploy -> Run workflow
+```
+
+The workflow builds the Docker image, pushes it to Artifact Registry, connects to the GKE cluster, and runs:
+
+```bash
+helm upgrade --install portfolio-api helm/portfolio-api
+```
+
+### 3. Find the Demo API IP
+
+Connect `kubectl` to the cluster:
+
+```bash
+$(terraform output -raw get_credentials_command)
+```
+
+Then check the service:
+
+```bash
+kubectl get svc portfolio-api
+```
+
+Or use the helper script from the repository root:
+
+```bash
+./scripts/demo-status.sh
+```
+
+Copy the `EXTERNAL-IP`.
+
+### 4. Update Cloudflare
+
+In Cloudflare DNS, point the `api.elgart.tech` `A` record to the new `EXTERNAL-IP`.
+
+Then test:
+
+```bash
+curl https://api.elgart.tech/health
+curl https://api.elgart.tech/cv
+```
+
+### 5. Switch the Frontend to Demo Mode
+
+For production, the frontend uses:
+
+```js
+const API = "./cv.json";
+```
+
+For the DevOps demo, temporarily change it to:
+
+```js
+const API = "https://api.elgart.tech/cv";
+```
+
+The footer label changes automatically:
+
+```text
+DEVOPS DEMO · GKE · HELM
+```
+
+After the demo, switch it back to:
+
+```js
+const API = "./cv.json";
+```
+
+### 6. Tear Down the Demo
+
+When the demo is finished, destroy the paid infrastructure:
+
+```bash
+cd infra/demo
+terraform destroy
+```
+
+Or use the helper script from the repository root:
+
+```bash
+./scripts/demo-down.sh
+```
+
+After destroy, verify there are no leftover paid resources in GCP:
+
+```bash
+gcloud compute forwarding-rules list
+gcloud compute addresses list
+gcloud compute routers list
+gcloud container clusters list
+```
+
+The main cost-control rule is: create the demo, run it, show it, then destroy it.
 
 ---
 

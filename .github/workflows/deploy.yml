@@ -44,6 +44,6 @@ jobs:
 
       - name: Deploy with Helm
         run: |
-          helm upgrade portfolio-api helm/portfolio-api \
+          helm upgrade --install portfolio-api helm/portfolio-api \
             --set image.tag=${{ github.sha }} \
             --set image.repository=${{ env.IMAGE }}
