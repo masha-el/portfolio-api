@@ -1,46 +1,68 @@
 # Portfolio API
 
-A live portfolio site backed by a real API running in Kubernetes on GCP.
+A portfolio site with a free production path and an on-demand DevOps demo path.
 
-The frontend fetches CV data dynamically from a FastAPI backend — no static JSON, no mock data. The entire stack is deployed and managed with Helm, exposed via Cloudflare, and automatically redeployed on every push via GitHub Actions.
+The production site is hosted on GitHub Pages and reads CV data from a static JSON file. This keeps the public portfolio always available without running paid GCP infrastructure.
+
+The FastAPI, Docker, Helm, GKE, Artifact Registry, Cloudflare, and GitHub Actions setup is kept as a DevOps demo environment. It can be deployed manually when needed for interviews or practice, then shut down to control GCP costs.
 
 **Live frontend:** https://masha-el.github.io/portfolio-api  
-**Live API:** https://api.elgart.tech/cv
+**Production data source:** `docs/cv.json`  
+**Demo API:** https://api.elgart.tech/cv
 
-> ⚠️ The GKE cluster is not always running. To manage GCP costs, it is spun up for demos and interviews and torn down afterward. If the API is unreachable, the frontend will show an error message.
+> The demo API is not expected to be always running. The GKE cluster should be started only for demos or practice and torn down afterward.
 
 ---
 
 ## Architecture
 
+### Production
+
 ```
 Browser
   │
-  ├── GitHub Pages (frontend) ─────────────────────────────────────┐
-  │                                                                 │
-  └── Cloudflare (TLS · api.elgart.tech) ──► GKE LoadBalancer      │
-                                                    │               │
-                                             ┌──────▼──────┐       │
-                                             │  FastAPI pod │◄──────┘
-                                             │  (cv.json)   │   fetches /cv
-                                             └─────────────┘
-                                                    ▲
-                                             Helm chart deploy
-                                                    ▲
-                                             GitHub Actions CI/CD
-                                                    ▲
-                                             Artifact Registry (Docker image)
+  └── GitHub Pages
+        ├── docs/index.html
+        └── docs/cv.json
+```
+
+The production page fetches `./cv.json` from the same GitHub Pages site. No GKE cluster, public LoadBalancer, Cloud NAT, or backend service is required for the live portfolio.
+
+### DevOps Demo
+
+```
+Browser
+  │
+  └── Cloudflare (TLS · api.elgart.tech)
+        │
+        ▼
+      GKE LoadBalancer
+        │
+        ▼
+      FastAPI pod
+        │
+        └── serves /cv and /health
+        ▲
+        │
+      Helm chart deploy
+        ▲
+        │
+      Manual GitHub Actions workflow
+        ▲
+        │
+      Artifact Registry Docker image
 ```
 
 | Layer | Technology |
 |---|---|
-| Frontend | GitHub Pages (static HTML/JS) |
-| DNS + TLS | Cloudflare (Flexible SSL) |
-| Backend | FastAPI (Python) |
-| Container registry | GCP Artifact Registry |
-| Orchestration | GKE (Google Kubernetes Engine) |
-| Deployment | Helm |
-| CI/CD | GitHub Actions |
+| Production hosting | GitHub Pages |
+| Production data | Static `docs/cv.json` |
+| Demo DNS + TLS | Cloudflare |
+| Demo backend | FastAPI (Python) |
+| Demo container registry | GCP Artifact Registry |
+| Demo orchestration | GKE (Google Kubernetes Engine) |
+| Demo deployment | Helm |
+| Demo CI/CD | GitHub Actions manual workflow |
 | Region | `me-west1` (Tel Aviv) |
 
 ---
@@ -50,7 +72,6 @@ Browser
 ```
 portfolio-api/
 ├── main.py                  # FastAPI app
-├── cv.json                  # CV data served by the API
 ├── requirements.txt
 ├── Dockerfile
 ├── helm/
@@ -61,10 +82,11 @@ portfolio-api/
 │           ├── deployment.yaml
 │           └── service.yaml
 ├── docs/                    # GitHub Pages frontend
-│   └── index.html
+│   ├── index.html
+│   └── cv.json              # Production CV data
 └── .github/
     └── workflows/
-        └── deploy.yml       # CI/CD pipeline
+        └── deploy.yml       # Manual DevOps demo deployment
 ```
 
 ---
@@ -80,13 +102,22 @@ portfolio-api/
 
 ## CI/CD Pipeline
 
-Every push to `main` triggers the GitHub Actions workflow which:
+The GKE deployment workflow is manual. It is triggered from GitHub Actions with `workflow_dispatch`:
+
+```yaml
+on:
+  workflow_dispatch:
+```
+
+When run manually, the workflow:
 
 1. Builds a `linux/amd64` Docker image
 2. Tags it with the commit SHA
 3. Pushes it to GCP Artifact Registry
 4. Authenticates to GKE
 5. Runs `helm upgrade` with the new image tag
+
+This keeps the DevOps demo deployable while preventing every push to `main` from starting or updating paid GCP infrastructure.
 
 ---
 
@@ -123,6 +154,8 @@ helm uninstall portfolio-api
 
 ## Key Design Decisions
 
+- **Separate production and demo paths** — the live portfolio is static and free to host, while the Kubernetes setup remains available for hands-on DevOps practice.
+- **Manual GitHub Actions deployment** — `workflow_dispatch` prevents automatic GKE deployments on every push.
 - **`linux/amd64` build target** — GKE runs on amd64; local Mac builds arm64 by default. `docker buildx` with `--platform linux/amd64` is required.
 - **Rolling update strategy `maxSurge: 0`** — single-node cluster has limited CPU. Killing the old pod before starting the new one prevents scheduling failures.
 - **Commit SHA as image tag** — guarantees K8s always pulls the updated image. Mutable tags like `latest` can cause stale deployments.
