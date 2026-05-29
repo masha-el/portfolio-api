@@ -472,6 +472,9 @@
 
   <script>
     const API = "./cv.json";
+    const DATA_SOURCE_LABEL = API.startsWith("http")
+      ? "DEVOPS DEMO · GKE · HELM"
+      : "GITHUB PAGES · STATIC HOSTING";
 
     const SKILL_CATEGORIES = [
      { label: "Orchestration", skills: ["Kubernetes", "Helm", "ArgoCD", "GitOps", "Docker"] },
@@ -595,7 +598,7 @@
         <div class="footer">
           <div class="api-badge">
             <span class="api-dot"></span>
-            LIVE DATA · GKE · HELM
+            ${DATA_SOURCE_LABEL}
           </div>
           <div class="api-badge">${API}</div>
         </div>
