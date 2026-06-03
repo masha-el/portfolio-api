@@ -190,7 +190,13 @@ header::before {
     font-weight: 500;
 }
 
-.cta-btn.primary:hover { background: #ff9bac; border-color: #ff9bac; }
+.cta-btn.primary:hover,
+.cta-btn.primary:focus,
+.cta-btn.primary:visited {
+    background: #ff9bac;
+    border-color: #ff9bac;
+    color: #080b10;
+}
 
 .cta-btn.secondary {
     background: transparent;
@@ -287,6 +293,7 @@ section:nth-of-type(4) { animation-delay: 0.4s; }
 
 .skill-tag.primary-skill:hover {
   background: linear-gradient(135deg, #ff879b, #ffc0b3);
+  color: #170b10;
 }
 
 .card {
@@ -548,6 +555,6 @@ section:nth-of-type(4) { animation-delay: 0.4s; }
   }
 
   .skill-tag.primary-skill {
-    font-size: 0.9rem;
+    font-size: 0.86rem;
   }
 }
