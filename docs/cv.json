@@ -1,6 +1,6 @@
 {
   "name": "Maria Elgart",
-  "title": "Platform Engineer",
+  "title": "Cloud & Infrastructure Engineer",
   "contact": {
     "phone": "(054)-3301762",
     "email": "masha.elgart@gmail.com",
@@ -17,20 +17,32 @@
         "role": "DevOps Engineer",
         "period": "2025-2026",
         "highlights": [
+            "Designed and delivered an end-to-end CI/CD pipeline for a QA team application, owning the full solution from architecture to deployment in close collaboration with developers",
             "Built and optimized CI/CD pipelines (Jenkins + AWS) for QA workflows, reducing execution time by 65% (60 → 20 minutes)",
             "Owned AWS infrastructure operations including IAM, networking, EC2, RDS, and S3 across production environments",
-            "Implemented monitoring and alerting using Grafana and CloudWatch, improving visibility into system health",
+            "Wrote Python automation scripts to streamline operational tasks, reducing manual toil and improving consistency across environments",
             "Managed identity and access systems (Twingate, Okta), strengthening security and access control processes"
         ]
         },
         {
         "company": "OpsGuru - Consultant / Client: Gong",
         "role": "DevOps Engineer",
-        "period": "2021-2025",
+        "period": "2023-2025",
         "highlights": [
             "Operated and maintained large-scale production Kubernetes (EKS) clusters across multi-account AWS environments supporting tens of thousands of servers",
             "Improved deployment reliability and reduced bottlenecks by optimizing GitOps workflows using ArgoCD and Git",
             "Collaborated with engineering teams to design scalable infrastructure and deployment strategies in high-availability systems"
+        ]
+        },
+        {
+        "company": "OpsGuru",
+        "role": "DevOps Engineer",
+        "period": "2021-2025",
+        "highlights": [
+            "Designed and managed cloud infrastructure (AWS, GCP) using Terraform and Terragrunt across multiple environments and clients",
+            "Built and maintained CI/CD pipelines using Jenkins, GitHub Actions, and ArgoCD (GitOps)",
+            "Automated infrastructure provisioning and deployment processes to improve consistency and reduce manual work",
+            "Led deep-dive debugging of complex system issues across distributed environments"
         ]
         },
         {
