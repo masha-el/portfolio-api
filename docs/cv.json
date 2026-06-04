@@ -9,7 +9,7 @@
   "skills": [
     "Kubernetes", "Helm", "ArgoCD", "Terraform", "Terragrunt",
     "CI/CD", "GitOps", "Docker", "Python", "AWS", "GCP",
-    "Jenkins", "Grafana", "Bash", "Twingate", "ESET"
+    "Jenkins", "Grafana", "Bash", "Twingate"
   ],
   "experience": [
         {
